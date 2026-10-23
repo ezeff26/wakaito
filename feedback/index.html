@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ワカイトキー フィードバック</title>
+<link rel="icon" href="../images/logo.png" type="image/png">
+<!-- wakaito.com/feedback → 피드백 구글 폼으로 넘긴다 (download/ 와 같은 방식).
+     앱 트레이 메뉴 「フィードバックを送る」와 사이트가 이 주소만 쓰므로, 폼이 바뀌면 아래 세 곳(meta refresh, 링크, FORM_URL)만 고친다. -->
+<meta http-equiv="refresh" content="0; url=https://docs.google.com/forms/d/e/1FAIpQLSfXl3qsrebRuUpX7f54C4Yzlll4M0JcSg3LqivL1KgtfjzjaQ/viewform">
+<style>
+  body { font-family: 'Yu Gothic UI', 'Meiryo', sans-serif; text-align: center; padding: 80px 20px; color: #1f2937; background: #f9fafb; line-height: 1.8; }
+  a { color: #2563eb; font-weight: 700; }
+</style>
+</head>
+<body>
+  <p>フィードバックフォームを開いています…</p>
+  <p>開かない場合は<a id="link" href="https://docs.google.com/forms/d/e/1FAIpQLSfXl3qsrebRuUpX7f54C4Yzlll4M0JcSg3LqivL1KgtfjzjaQ/viewform">こちら</a>をクリックしてください。</p>
+  <p><a href="../">← ワカイトキー</a></p>
+<script>
+  var FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfXl3qsrebRuUpX7f54C4Yzlll4M0JcSg3LqivL1KgtfjzjaQ/viewform";
+  location.replace(FORM_URL);
+</script>
+</body>
+</html>

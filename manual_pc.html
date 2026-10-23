@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ワカイトキー 取扱説明書</title>
+<link rel="icon" href="images/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f9fafb; --surface:#ffffff; --ink:#111827; --ink-2:#4b5563; --ink-3:#9ca3af;
+  --line:#e5e7eb; --accent:#2563eb; --accent-soft:#eff6ff;
+  --warn-bg:#fff7ed; --warn-line:#fdba74;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Noto Sans JP',sans-serif;line-height:1.85;line-break:strict;overflow-wrap:break-word;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--accent)}
+code{font-size:.9em;background:#f3f4f6;padding:1px 6px;border-radius:5px;word-break:break-all}
+
+/* nav */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1160px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.topbar img{height:40px;width:auto}
+.topbar .tag{font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:6px 12px;border-radius:999px;white-space:nowrap}
+
+/* hero */
+.hero{background:linear-gradient(180deg,#f9c9c9 0%,#fdf0ef 100%);padding:56px 20px 40px}
+.hero .in{max-width:1160px;margin:0 auto}
+.hero h1{font-size:clamp(26px,4.6vw,44px);font-weight:900;margin:0 0 8px;letter-spacing:-.01em}
+.hero p{margin:0 0 28px;color:#1f2937;font-size:clamp(15px,2vw,18px)}
+.hero .map{background:rgba(255,255,255,.6);border-radius:20px;padding:clamp(10px,2vw,22px);box-shadow:0 10px 30px rgba(190,24,93,.10)}
+.hero .dl{display:inline-flex;align-items:center;gap:10px;background:#111827;color:#fff;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:12px;margin:0 0 28px}
+.hero .dl:hover{background:var(--accent)}
+.hero .dl small{font-weight:400;opacity:.75}
+
+/* layout */
+.wrap{max-width:1160px;margin:0 auto;padding:40px 20px 80px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px}
+.toc{position:sticky;top:84px;align-self:start;font-size:14px}
+.toc b{display:block;color:var(--ink-3);font-size:12px;letter-spacing:.08em;margin-bottom:8px}
+.toc a{display:block;color:var(--ink-2);text-decoration:none;padding:5px 10px;border-left:2px solid var(--line)}
+.toc a:hover{color:var(--ink)}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;gap:0}.toc{display:none}}
+
+section{padding-bottom:56px;margin-bottom:56px;border-bottom:1px solid var(--line)}
+section:last-child{border-bottom:0}
+h2{font-size:clamp(22px,3vw,28px);font-weight:900;margin:0 0 6px}
+h2 .n{color:var(--accent);margin-right:10px}
+h3{font-size:18px;margin:32px 0 10px}
+.lead{color:var(--ink-2);margin:0 0 20px}
+p{margin:0 0 14px}
+ol.steps-list{margin:0;padding-left:24px}
+ol.steps-list li{margin-bottom:8px}
+
+kbd{display:inline-flex;align-items:center;justify-content:center;min-width:1.9em;height:1.9em;padding:0 .45em;
+  font:700 .88em/1 'Noto Sans JP',sans-serif;color:var(--ink);background:#fff;border:1px solid #d1d5db;border-bottom-width:3px;border-radius:7px;vertical-align:.05em;text-transform:uppercase;white-space:nowrap}
+kbd.w{min-width:auto;text-transform:none}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+.figure{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:16px 0}
+.figure figcaption{font-size:13px;color:var(--ink-3);margin-top:10px;text-align:center}
+
+.note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:16px 0;font-size:15px}
+.warn{background:var(--warn-bg);border-left:4px solid var(--warn-line);border-radius:10px;padding:14px 16px;margin:16px 0;font-size:15px}
+.note b:first-child,.warn b:first-child{display:block;margin-bottom:2px}
+.sub{font-size:14px;color:var(--ink-2)}
+
+.tbl{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;font-size:15px}
+.tbl th,.tbl td{padding:10px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.tbl th{background:#f3f4f6;font-size:13px;color:var(--ink-2);font-weight:700}
+.tbl tr:last-child td{border-bottom:0}
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius)}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:700px){.two{grid-template-columns:1fr}}
+
+.faq details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin:10px 0}
+.faq summary{cursor:pointer;font-weight:700;padding:14px 0;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:'Q.';color:var(--accent);margin-right:8px}
+.faq details[open] summary{border-bottom:1px solid var(--line);margin-bottom:12px}
+.faq details>div{padding-bottom:14px;font-size:15px;color:#374151}
+
+footer{text-align:center;color:var(--ink-3);font-size:13px;padding:30px 20px 50px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="in">
+    <a href="index.html"><img src="images/logotype.png" alt="ワカイトキー"></a>
+    <span class="tag">取扱説明書</span>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="in">
+    <h1>ワカイトキー 取扱説明書</h1>
+    <p>Windowsの日本語入力で、左手のテンキーと右手のフリックキーを使ってかなを入力する方法を説明します。</p>
+    <a class="dl" href="download/">ダウンロード <small>Windows 10 / 11</small></a>
+    <div class="map"><img src="images/pc.png" alt="ワカイトキーのキー配列"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="toc">
+    <b>目次</b>
+    <a href="#summary">1. 早見表</a>
+    <a href="#start">2. 動作環境</a>
+    <a href="#install">3. インストール</a>
+    <a href="#onoff">4. オン・オフの切り替え（CapsLock）</a>
+    <a href="#layout">5. キー配列</a>
+    <a href="#convert">6. 予測と変換</a>
+    <a href="#faq">7. 困ったときは</a>
+    <a href="#remove">8. 自動起動の停止とアンインストール</a>
+  </nav>
+
+  <main>
+
+  <section id="summary">
+    <h2><span class="n">1</span>早見表</h2>
+    <p class="lead">これだけ覚えればすぐに使えます。</p>
+    <div class="tbl-scroll">
+    <table class="tbl">
+      <tr><th style="width:38%">したいこと</th><th>キー</th></tr>
+      <tr><td>あ／A の切り替え</td><td><kbd class="w">CapsLock</kbd></td></tr>
+      <tr><td>入力がおかしいときに戻す</td><td><kbd class="w">CapsLock</kbd> をすばやく2回</td></tr>
+      <tr><td>大文字固定</td><td><kbd class="w">Shift</kbd> + <kbd class="w">CapsLock</kbd></td></tr>
+      <tr><td>あ段の文字</td><td>行キー <kbd>W</kbd><kbd>E</kbd><kbd>R</kbd> / <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd> / <kbd>X</kbd><kbd>C</kbd><kbd>V</kbd></td></tr>
+      <tr><td>い・う・え・お段</td><td>行キーのあとに <kbd>J</kbd>◀ <kbd>I</kbd>▲ <kbd>L</kbd>▶ <kbd>K</kbd>▼</td></tr>
+      <tr><td>濁点・半濁点・小文字</td><td><kbd>U</kbd>（押すたびに切り替わります）</td></tr>
+      <tr><td>ん／っ／ー</td><td><kbd>O</kbd>／<kbd>P</kbd>／<kbd>Q</kbd></td></tr>
+      <tr><td>1文字削除</td><td><kbd>N</kbd> または <kbd class="w">BackSpace</kbd></td></tr>
+      <tr><td>予測候補</td><td><kbd class="w">Space</kbd></td></tr>
+      <tr><td>変換候補</td><td><kbd>M</kbd></td></tr>
+      <tr><td>候補の移動</td><td><kbd class="w">Space</kbd>・<kbd>I</kbd>・<kbd>J</kbd>・<kbd>L</kbd></td></tr>
+      <tr><td>確定</td><td><kbd>K</kbd>（▼）　※ひらがなのまま確定するときは <kbd class="w">Enter</kbd></td></tr>
+      <tr><td>ひとつ前に戻る</td><td><kbd class="w">Esc</kbd></td></tr>
+      <tr><td>フリック入力のオン・オフ</td><td>タスクトレイのアイコンを右クリック →「フリック ON／OFF」</td></tr>
+    </table>
+    </div>
+  </section>
+
+  <section id="start">
+    <h2><span class="n">2</span>動作環境</h2>
+    <p class="lead">ワカイトキーは「フリックアダプター」です。いつもの日本語入力（IME）のまま、フリックで入力できるようになります。</p>
+    <table class="tbl">
+      <tr><th style="width:32%">項目</th><th>条件</th></tr>
+      <tr><td>OS</td><td>Windows 10 / 11（64ビット）</td></tr>
+      <tr><td>日本語入力</td><td>Microsoft IME または Google 日本語入力<br><span class="sub">※ ATOKには、現在対応していません。</span></td></tr>
+      <tr><td>入力方式</td><td>ローマ字入力</td></tr>
+    </table>
+  </section>
+
+  <section id="install">
+    <h2><span class="n">3</span>インストール</h2>
+    <p class="lead">インストーラーを実行するだけで完了します。管理者権限は必要ありません。</p>
+    <div class="card">
+      <ol class="steps-list">
+        <li><a href="download/">wakaito.com/download</a> から <code>Wakaitokey_Setup.exe</code> をダウンロードして実行します。</li>
+        <li>インストール先を選びます。通常は<b>自分だけ</b>にインストールしてください（管理者権限は不要です）。このPCのすべてのユーザーにインストールする場合は、管理者権限が必要です。</li>
+        <li>「Windows の起動時に Wakaitokey を自動で起動する」は、最初からオンになっています。デスクトップのアイコンと「画面に「フリック ON / OFF」を表示する」（4章）は、お好みで選んでください。</li>
+        <li>インストールが終わるとワカイトキーが起動し、画面右下の通知領域（タスクトレイ）にワカイトキーのアイコンが表示されます。</li>
+      </ol>
+    </div>
+    <p>アップデートするときは、新しいインストーラーをそのまま実行してください。起動中のワカイトキーは自動で終了され、上書きされます。</p>
+  </section>
+
+  <section id="onoff">
+    <h2><span class="n">4</span>オン・オフの切り替え（CapsLock）</h2>
+    <p class="lead">ワカイトキーは、日本語入力が<b>ひらがな（「あ」）</b>のときだけ動作します。英数（「A」）のときや、ほかの言語の入力方式では、キーボードはふだんどおりに動作します。</p>
+    <div class="tbl-scroll">
+    <table class="tbl">
+      <tr><th style="width:34%">押すキー</th><th>動作</th></tr>
+      <tr><td><kbd class="w">CapsLock</kbd> を1回</td><td><b>あ／A</b> の切り替え。</td></tr>
+      <tr><td><kbd class="w">CapsLock</kbd> をすばやく2回</td><td><b>必ずひらがなに戻ります。</b>ワカイトキーが認識している状態と実際の日本語入力の状態がずれたときに使う「リセットボタン」です。</td></tr>
+      <tr><td><kbd class="w">Shift</kbd> + <kbd class="w">CapsLock</kbd></td><td><b>大文字固定</b>。もう一度押すと解除されます。</td></tr>
+      <tr><td>タスクトレイのアイコンを右クリック</td><td>「フリック ON／OFF」：フリック入力のオン・オフ（OFFのときはキーボードがふだんどおりに動作）<br>「インジケーターを表示」：下のインジケーターの表示・非表示<br>「フィードバックを送る」：ご意見や不具合を送るフォームを開きます<br>「終了」：ワカイトキーを終了します</td></tr>
+    </table>
+    </div>
+
+    <h3>フリック ON／OFF インジケーター</h3>
+    <p>タスクトレイのメニューで「インジケーターを表示」にチェックを入れると、日本語入力を使っている間、画面右下にフリック入力のオン・オフを切り替えるスイッチが表示されます。</p>
+    <div class="figure" style="display:flex;justify-content:center">
+      <div style="display:inline-flex;align-items:stretch;border:1px solid #9ca3af;font-weight:700;font-size:15px;line-height:1;background:#fff">
+        <span style="display:flex;align-items:center;padding:0 6px 0 8px"><img src="images/logo.png" alt="" style="width:18px;height:18px"></span>
+        <span style="display:flex;align-items:center;padding:8px 12px 8px 4px;color:#333">フリック</span>
+        <span style="display:flex;align-items:center;padding:8px 12px;background:#e60012;color:#fff">ON</span>
+        <span style="display:flex;align-items:center;padding:8px 12px;background:#ededed;color:#a8a8a8">OFF</span>
+      </div>
+    </div>
+    <div class="tbl-scroll">
+    <table class="tbl">
+      <tr><th style="width:34%">操作</th><th>動作</th></tr>
+      <tr><td>「ON」／「OFF」をクリック</td><td>フリック入力のオン・オフを切り替えます。「OFF」のときはワカイトキーが止まり、キーボードはふだんどおりに動作します。タスクトレイのメニューの「フリック ON／OFF」と同じです。</td></tr>
+      <tr><td>アイコンまたは「フリック」の部分をドラッグ</td><td>好きな場所に移動できます。移動した位置は次回も保たれます。</td></tr>
+    </table>
+    </div>
+    <p style="margin-top:14px">OFFのときは薄く、ONのときははっきり表示されます。ほかの言語の入力方式を使っているときや、ゲーム・動画などを全画面で表示しているときは表示されません。</p>
+
+    <h3>「すばやく2回」が必要な理由</h3>
+    <p>ワカイトキーはほとんどのアプリで日本語入力の状態を自動で読み取るため、マウスで「あ／A」を切り替えても自動で追従します。</p>
+    <p>ただし、<b>一部のアプリ</b>（Windowsの設定や電卓などのストアアプリ、新しいOutlook、OneDriveなど）では状態を読み取れません。こうしたアプリでタスクバーの「あ／A」を<b>マウスで</b>切り替えると、ワカイトキーがその変化を知ることができず、以降 <kbd class="w">CapsLock</kbd> を押すたびに逆の動作になってしまいます。</p>
+    <div class="note"><b>入力がおかしいと思ったら、まず CapsLock を2回</b>かなキーを押したのにローマ字がそのまま出る、英字を入力したいのにかなが出る、といったときは <kbd class="w">CapsLock</kbd> をすばやく2回押してください。ひらがなの状態に戻ります。英字を入力したいときは、そのあと1回押します。</div>
+  </section>
+
+  <section id="layout">
+    <h2><span class="n">5</span>キー配列</h2>
+    <p class="lead">左手で<b>行</b>を選び、右手で<b>段</b>を選びます。スマートフォンのフリック入力と同じ考え方を、PCのキーボードに移したものです。</p>
+    <figure class="figure"><img src="images/pc.png" alt="キー配列"><figcaption>左手テンキー（行）・右手フリックキー（段）・予測＝Space・変換＝M</figcaption></figure>
+    <h3>覚え方</h3>
+    <figure class="figure"><img src="images/mnemonic.png" alt="まずは / 若い時 / やりな!"><figcaption>上の段 まさは＝「まずは」、中の段 わかあた＝「若い時」、下の段 やらな＝「やりな！」</figcaption></figure>
+  </section>
+
+  <section id="convert">
+    <h2><span class="n">6</span>予測と変換</h2>
+    <p class="lead">かなを入力したら、2つの方法で漢字やカタカナにできます。どちらの場合も、<b>候補を選んでいる間は右手のフリックキーがカーソルの役割</b>をし、<kbd>K</kbd>（▼）で確定します。</p>
+    <div class="two">
+      <div class="card">
+        <b><kbd class="w">Space</kbd>＝予測</b>
+        <p style="margin:8px 0 0;font-size:15px">入力中に表示される<b>予測候補</b>の一覧に移動します。長い言葉やよく使う表現を、最後まで入力せずに選べます。</p>
+      </div>
+      <div class="card">
+        <b><kbd>M</kbd>＝変換</b>
+        <p style="margin:8px 0 0;font-size:15px">通常の<b>変換候補</b>の一覧を開きます。入力したかなを漢字に変換するときに使います。</p>
+      </div>
+    </div>
+
+    <h3>候補を選んでいる間のキー</h3>
+    <div class="tbl-scroll">
+    <table class="tbl">
+      <tr><th style="width:30%">キー</th><th>予測候補（Space で表示）</th><th>変換候補（M で表示）</th></tr>
+      <tr><td><kbd class="w">Space</kbd></td><td>次の候補 ▼</td><td>次の候補 ▼</td></tr>
+      <tr><td><kbd>M</kbd></td><td>予測をやめて<b>変換に切り替え</b></td><td>次の候補 ▼</td></tr>
+      <tr><td><kbd>I</kbd> ▲</td><td>前の候補</td><td>前の候補</td></tr>
+      <tr><td><kbd>J</kbd> ◀ ／ <kbd>L</kbd> ▶</td><td>［←］［→］キーと同じ</td><td>［←］［→］キーと同じ（文節の移動）</td></tr>
+      <tr><td><kbd>K</kbd> ▼</td><td colspan="2"><b>確定</b></td></tr>
+      <tr><td><kbd class="w">Esc</kbd> ／ <kbd>N</kbd> ／ <kbd class="w">BackSpace</kbd></td><td colspan="2">ひとつ前に戻る（候補一覧を閉じて入力中の状態へ）</td></tr>
+      <tr><td>行キー（かな）</td><td colspan="2">選んだ候補を確定し、そのまま次の文字を入力</td></tr>
+    </table>
+    </div>
+    <p style="margin-top:14px"><kbd class="w">Enter</kbd> を押すと、ふだんどおり入力中の文字をそのまま（ひらがなで）確定します。マウスでクリックしても入力中の状態はリセットされます。</p>
+    <p>入力中の文字がないときの <kbd class="w">Space</kbd> は、通常のスペースです。</p>
+  </section>
+
+  <section id="faq" class="faq">
+    <h2><span class="n">7</span>困ったときは</h2>
+    <details open><summary>かなキーを押すとローマ字（w、e、r…）がそのまま出る／英字を入力したいのにかなが出る</summary>
+      <div><kbd class="w">CapsLock</kbd> をすばやく2回押してください。ひらがなの状態に戻ります。ストアアプリや新しいOutlookなどで、日本語入力をマウスで切り替えたあとに起こりやすい現象です（4章を参照）。</div></details>
+    <details><summary>1つのキーでかなが2文字ずつ出る／違うかなが出る</summary>
+      <div>日本語入力が「<b>かな入力</b>」（キーボードに刻印されたかなで入力する方式）に設定されている可能性があります。ワカイトキーは「<b>ローマ字入力</b>」の設定で動作します。日本語入力の設定で「ローマ字入力」に切り替えてください。</div></details>
+    <details><summary>どのキーを押してもワカイトキーとして動作しない</summary>
+      <div><ol class="steps-list">
+        <li>タスクトレイにワカイトキーのアイコンがあるか確認してください。ない場合は、スタートメニューから Wakaitokey を起動します。</li>
+        <li>入力方式が<b>日本語（Microsoft IME または Google 日本語入力）</b>になっているか確認してください（<kbd class="w">Win</kbd>+<kbd class="w">Space</kbd> で切り替えられます）。</li>
+        <li>日本語入力の表示が「あ」（ひらがな）になっているか確認してください。「A」の場合は <kbd class="w">CapsLock</kbd> を押します。</li>
+        <li>タスクトレイのアイコンを右クリックして、「フリック ON」が選ばれているか確認してください。</li>
+      </ol></div></details>
+    <details><summary>管理者として実行しているアプリでだけ動作しない</summary>
+      <div>Windowsのセキュリティの仕組みにより、通常の権限で動いているワカイトキーは、管理者として実行されているアプリにキー入力を送ることができません。そのアプリを通常の権限で起動するか、そのアプリではワカイトキーを使わずに入力してください。</div></details>
+    <details><summary>大文字固定（Caps Lock）を使いたい</summary>
+      <div><kbd class="w">Shift</kbd>+<kbd class="w">CapsLock</kbd> を押してください。もう一度押すと解除されます。</div></details>
+    <details><summary>ほかのキーボード関連ソフトと一緒に使えますか？</summary>
+      <div>同じキーの動作を変更するソフトと一緒に使うと、正しく動作しないことがあります。問題が起きた場合は、ほかのソフトをいったん止めて確認してください。</div></details>
+    <details><summary>ワカイトキーを一時的に止めたい</summary>
+      <div>タスクトレイのアイコンを右クリック →「<b>フリック OFF</b>」（インジケーターを表示している場合は「OFF」をクリック）。ワカイトキーが止まり、キーボードはふだんどおりに動作します。再び使うときは「<b>フリック ON</b>」を選びます。完全に終了するときは「<b>終了</b>」を選び、再び使うときはスタートメニューから Wakaitokey を起動してください。</div></details>
+    <details open><summary>お問い合わせ</summary>
+      <div>ご質問や不具合のご報告は <a href="mailto:wakaito.cs@gmail.com"><b>wakaito.cs@gmail.com</b></a> までお送りください。Windowsのバージョン、お使いの日本語入力（Microsoft IME／Google 日本語入力）、問題が起きたアプリを書き添えていただけると、早く確認できます。</div></details>
+  </section>
+
+  <section id="remove">
+    <h2><span class="n">8</span>自動起動の停止とアンインストール</h2>
+    <h3>Windows起動時の自動起動を止める</h3>
+    <p><kbd class="w">Ctrl</kbd>+<kbd class="w">Shift</kbd>+<kbd class="w">Esc</kbd> でタスクマネージャーを開き →「<b>スタートアップ アプリ</b>」→ Wakaitokey →「<b>無効にする</b>」。</p>
+    <h3>アンインストール</h3>
+    <p>Windowsの「<b>設定</b>」→「<b>アプリ</b>」→「<b>インストールされているアプリ</b>」→ Wakaitokey →「<b>アンインストール</b>」。起動中の場合は自動で終了してから削除されます。</p>
+  </section>
+
+  </main>
+</div>
+
+<footer>
+  <p><a href="index.html" style="color:inherit;margin:0 8px">ホーム</a><a href="terms.html" style="color:inherit;margin:0 8px">利用規約</a><a href="privacy.html" style="color:inherit;margin:0 8px">プライバシーポリシー</a></p>
+  © 2026 WAKAITOKEY All rights reserved.
+</footer>
+</body>
+</html>

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ワカイトキー</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="icon" href="images/logo.png" type="image/png">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%; margin: 0;
+    font-family: 'Noto Sans KR', 'Noto Sans JP', 'Malgun Gothic', 'Yu Gothic', system-ui, sans-serif;
+    background: #cfe8f6;
+  }
+  .jp { font-family: 'Noto Sans JP', 'Noto Sans KR', 'Yu Gothic', sans-serif; }
+
+  #homeBtn, #clearBtn {
+    position: fixed; z-index: 10000;
+    padding: 10px 18px; font-size: 1.02em; font-weight: 700;
+    color: #fff; border: none; border-radius: 8px; cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  }
+  #homeBtn  { top: 20px; right: 24px; background:#3f6fb8; }
+  #clearBtn { top: 20px; right: 132px; background:#6b7280; display:none; }
+
+  /* bg_tutorial.png(1920x1148) 위에 % 좌표로 오버레이만 얹는다. 배경 이미지가
+     width:100%/height:auto라 #stage 렌더 크기가 바뀌어도 % 오버레이는 항상
+     이미지 위 같은 자리를 가리킨다. bg_tutorial_blind.png도 키 배열이 동일해서
+     같은 좌표계를 그대로 쓴다. */
+  #stage {
+    position: relative;
+    width: min(1180px, 97vw);
+    margin: clamp(8px, 2.4vh, 34px) auto 0;
+  }
+  #bg-img { display:block; width:100%; height:auto; user-select:none; -webkit-user-drag:none; }
+
+  .ov { position:absolute; pointer-events:none; }
+
+  /* ── 입력창(배경 이미지 상단의 흰 박스) ── */
+  #editor-wrap { left:6%; top:4.1%; width:88%; height:40%; padding:2.4% 3%; overflow:hidden; }
+  /* 가나 전용 모드에선 맨 위 라벨(#mode-tag)만큼 첫 줄을 아래로 민다 */
+  #editor-wrap.kana-only { padding-top:5%; }
+  #editor {
+    font-size: clamp(18px, 2.5vw, 34px); line-height: 1.5; color:#1c2733; font-weight:700;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  #editor .cursor {
+    display:inline-block; width:2px; height:1em; margin-left:1px; vertical-align:-2px;
+    background:#3a70b8; animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:0;} 50%{opacity:1;} }
+
+  /* ── 추천바 (IME 변환 후보 창 느낌) ── */
+  #recbar {
+    left:7%; top:15.5%; width:56%;
+    background: rgba(255,255,255,.98); border:1px solid #c7d3dd;
+    border-radius:8px; box-shadow:0 8px 22px rgba(0,0,0,.18);
+    overflow:visible; display:none;
+  }
+  #recbar .rec {
+    position:relative;
+    padding: 1.7% 3%; font-size: clamp(14px, 1.8vw, 22px); font-weight:700; color:#26313c;
+    border-bottom:1px solid #e7edf2; white-space:nowrap;
+  }
+  #recbar .rec:last-child { border-bottom:none; }
+  #recbar .rec.sel { background:#3f6fb8; color:#fff; }
+  #recbar .rec.sel:first-child { border-radius:7px 7px 0 0; }
+  #recbar .rec.sel:last-child  { border-radius:0 0 7px 7px; }
+
+  /* 후보 옆에 붙는 안내: ← 화살표 + 멘트, 같은 색으로 깜빡인다 */
+  #recbar .spark {
+    display:inline-block; margin-left:.7em; vertical-align:.04em;
+    font-size: clamp(12px, 1.45vw, 17px); font-weight:900; color:#f39c12;
+    white-space:nowrap;
+    animation: sparkBlink 1s ease-in-out infinite;
+  }
+  @keyframes sparkBlink { 0%,100%{opacity:1;} 50%{opacity:.28;} }
+
+  /* ── 지금 눌러야 할 키 위에 까딱이는 화살표 + 하이라이트 링 ── */
+  #key-arrow { width:0; transform: translateX(-50%); display:flex; flex-direction:column; align-items:center; }
+  #key-arrow.hidden, #key-ring.hidden { display:none; }
+  #key-arrow .tip {
+    width:0; height:0;
+    border-left:10px solid transparent; border-right:10px solid transparent;
+    border-top:14px solid #e0362f;
+    animation: bob .72s ease-in-out infinite;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.3));
+  }
+  @keyframes bob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(6px);} }
+  #key-ring {
+    border:4px solid #e0362f; border-radius:13px;
+    box-shadow:0 0 0 4px rgba(224,54,47,.25), 0 0 18px 4px rgba(224,54,47,.35);
+    animation: ringPulse .9s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%,100%{ box-shadow:0 0 0 4px rgba(224,54,47,.25), 0 0 16px 3px rgba(224,54,47,.30);}
+    50%{ box-shadow:0 0 0 6px rgba(224,54,47,.38), 0 0 26px 8px rgba(224,54,47,.5);}
+  }
+
+  @keyframes okBlink { 0%,100%{opacity:1;} 50%{opacity:.22;} }
+
+  /* ── 안내 팝업 카드: 입력창(흰 박스) 자리에만 뜬다 — 자판은 절대 가리지 않는다 ── */
+  #popup {
+    left:6%; top:4.1%; width:88%; height:40%;
+    display:none; align-items:center; justify-content:center; z-index:60;
+    pointer-events:none;
+  }
+  #popup .card {
+    width:100%; height:100%;
+    background:#fff; border:2px solid #e0e7ec; border-radius:14px;
+    padding:3% 5%; text-align:center;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    box-shadow:0 6px 18px rgba(0,0,0,.10);
+  }
+  #popup .msg {
+    font-size: clamp(15px, 2vw, 22px); font-weight:700; line-height:1.65; color:#1c2733;
+    white-space:pre-wrap;
+  }
+  #popup .msg .k { color:#c9760f; font-weight:900; }
+  #popup .okhint {
+    margin-top:4%; font-size: clamp(12px, 1.55vw, 17px); font-weight:800; color:#3f6fb8;
+    visibility:hidden;
+  }
+  #popup .okhint.show { visibility:visible; animation: okBlink .95s ease-in-out infinite; }
+
+  /* 가나 전용 모드 표시 — 추천바가 뜨던 자리에 얹어 "변환이 없다"는 걸 알려준다 */
+  #mode-tag {
+    display:none; left:7.5%; top:6%; max-width:88%;
+    padding:0.7% 2%; border-radius:8px;
+    background:rgba(255,255,255,.8); border:1px dashed #9db4c9;
+    color:#59687a; font-weight:800;
+    font-size: clamp(11px, 1.4vw, 16px);
+  }
+
+  /* 자유/블라인드 모드 토글 버튼 (스테이지 우하단, 두 모드에서 계속 보임) */
+  #blindBtn {
+    display:none; position:absolute; right:2%; bottom:3%;
+    padding:12px 18px; font-size:1em; font-weight:800; color:#fff;
+    background:#f59e0b; border:none; border-radius:10px; cursor:pointer;
+    box-shadow:0 3px 10px rgba(0,0,0,.25); z-index:50;
+  }
+  #blindBtn:hover { background:#d97706; }
+</style>
+</head>
+<body>
+
+<button id="homeBtn">Home</button>
+<button id="clearBtn">↺ Clear</button>
+
+<div id="stage">
+  <img id="bg-img" src="images/bg_tutorial.png" alt="" draggable="false" />
+
+  <div id="editor-wrap" class="ov"><span id="editor" class="jp"></span></div>
+  <div id="recbar" class="ov jp"></div>
+  <div id="mode-tag" class="ov">✏️ 仮名専用練習モード・変換・予測なしで入力のみ</div>
+
+  <div id="key-ring" class="ov hidden"></div>
+  <div id="key-arrow" class="ov hidden"><div class="tip"></div></div>
+
+  <div id="popup" class="ov"><div class="card">
+    <div id="popup-msg" class="msg jp"></div>
+    <div id="popup-ok" class="okhint">▶ 予測キー（スペース）を押してください</div>
+  </div></div>
+
+  <button id="blindBtn">🏆 ブラインドタッチ挑戦</button>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════
+   ワカイトキー(Wakaitokey) — 왼손 텐키 + 오른손 플릭키 일본어 가나 입력 튜토리얼
+   배열 2026-09-11 개편: 1행 ま/さ/は · 2행 わ/か/あ/た · 3행 や/ら/な
+     ("わは脇に、まずは / 若い時 / やりな!")
+   좌표는 모두 images/bg_tutorial.png 실측 기준 % (키 그리드는 이전과 동일, 가나 라벨만 이동).
+   bg_tutorial_blind.png도 키 배열이 사실상 동일해 같은 좌표를 공유한다.
+   ────────────────────────────────────────────────────────────────────── */
+
+// ── 물리 QWERTY 키 → 화면 위치(%) ──────────────────────────────────────
+const KEY_POS = {
+  w:[23.67,53.40], e:[30.39,53.40], r:[36.88,53.40],
+  a:[18.70,64.64], s:[25.31,64.64], d:[31.90,64.64], f:[38.39,64.64],
+  x:[28.23,75.80], c:[34.82,75.80], v:[41.30,75.80],
+  u:[60.94,53.40], i:[67.45,53.40], o:[74.22,53.40], p:[80.86,53.40],
+  j:[62.76,64.64], k:[69.06,64.64], l:[75.86,64.64],
+  m:[65.29,75.80],
+  space:[49.76,86.85],
+};
+const KEY_W = 5.6, KEY_H = 9.4;
+
+// ── 왼손 텐키: 가나 10행. 배열은 [center, ◀좌, ▲상, ▶우, ▼하] = [あ,い,う,え,お]단 ──
+const GROUPS = {
+  'あ': ['あ','い','う','え','お'],
+  'か': ['か','き','く','け','こ'],
+  'さ': ['さ','し','す','せ','そ'],
+  'た': ['た','ち','つ','て','と'],
+  'な': ['な','に','ぬ','ね','の'],
+  'は': ['は','ひ','ふ','へ','ほ'],
+  'ま': ['ま','み','む','め','も'],
+  'や': ['や','「','ゆ','」','よ'],   // ◀좌=「 ▶우=」 (.exe와 동일)
+  'ら': ['ら','り','る','れ','ろ'],
+  'わ': ['わ','を','ん','ー','を'],   // ▼하=を (.exe와 동일: わ행은 5열도 を)
+};
+const GROUP_KEYS = { w:'ま', e:'さ', r:'は', a:'わ', s:'か', d:'あ', f:'た', x:'や', c:'ら', v:'な' };
+const FLICK_KEYS = { j:1, i:2, l:3, k:4 };   // 좌1 상2 우3 하4 (중앙0)
+const STANDALONE = { o:'ん', p:'っ', q:'ー' };   // q=ー(장음부호) 2026-10-07 추가
+const BS_KEY = 'n';                               // n=⌫ (자판 그림의 BackSpace 키)
+
+// ── ゛小゚ 키: 마지막 글자를 탁점→반탁점→소문자 순으로 순환 ──
+// 촉음(っ)은 전용 키가 따로 있으므로 つ 순환에는 넣지 않는다.
+const DAKU = {
+  'か':'が','き':'ぎ','く':'ぐ','け':'げ','こ':'ご','さ':'ざ','し':'じ','す':'ず','せ':'ぜ','そ':'ぞ',
+  'た':'だ','ち':'ぢ','つ':'づ','て':'で','と':'ど','は':'ば','ひ':'び','ふ':'ぶ','へ':'べ','ほ':'ぼ',
+};
+const HANDAKU = { 'は':'ぱ','ひ':'ぴ','ふ':'ぷ','へ':'ぺ','ほ':'ぽ' };
+const SMALL = { 'あ':'ぁ','い':'ぃ','う':'ぅ','え':'ぇ','お':'ぉ','や':'ゃ','ゆ':'ゅ','よ':'ょ','わ':'ゎ' };
+// う만 특수: 히라가나 v음(ゔ)은 실질적으로 안 쓰이므로 소문자 ぅ 먼저, 한 번 더 누르면 카타카나 ヴ
+const MOD_OVERRIDE = { 'う': ['う','ぅ','ヴ'] };
+function modCycleFor(base) {
+  if (MOD_OVERRIDE[base]) return MOD_OVERRIDE[base];
+  const seq = [base];
+  if (DAKU[base]) seq.push(DAKU[base]);
+  if (HANDAKU[base]) seq.push(HANDAKU[base]);
+  if (SMALL[base]) seq.push(SMALL[base]);
+  return seq;
+}
+
+// ══ 에디터(입력창) ═══════════════════════════════════════════════════
+const editorEl = document.getElementById('editor');
+let rawText = '';
+function renderEditor() {
+  const esc = rawText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  editorEl.innerHTML = esc + '<span class="cursor"></span>';
+}
+function setText(t) { rawText = t; renderEditor(); }
+function appendText(c) { setText(rawText + c); }
+function replaceLast(c) { if (rawText.length) setText(rawText.slice(0,-1) + c); }
+
+// ══ 입력 엔진 ═══════════════════════════════════════════════════════
+let eng = { group:null, groupIdx:0, modBase:null, modIdx:0, modPos:-1 };
+function resetEng() { eng = { group:null, groupIdx:0, modBase:null, modIdx:0, modPos:-1 }; }
+// 텐키(가나 그룹키)는 멀티탭 없음 — 누를 때마다 새 글자(あ단)를 확정하고 이어 붙인다.
+// (같은 그룹 글자가 연달아 오는 이름 "ななせ" 등을 그대로 칠 수 있어야 하므로)
+function engGroup(name) {
+  appendText(GROUPS[name][0]);
+  eng.group = name; eng.groupIdx = 0;
+  eng.modBase = null; eng.modIdx = 0; eng.modPos = -1;
+}
+function engFlick(idx) {
+  if (!eng.group) return;
+  const ch = GROUPS[eng.group][idx];
+  if (ch == null) return;
+  replaceLast(ch);
+  // .exe와 동일: や행의 「」(좌·우 플릭)와 わ행의 모든 플릭 결과는 그 자리에서 확정 —
+  // 이후 방향키를 더 눌러도 바뀌지 않는다.
+  if ((eng.group === 'や' && (ch === '「' || ch === '」')) || eng.group === 'わ') {
+    resetEng();
+    return;
+  }
+  eng.groupIdx = idx;
+  eng.modBase = null; eng.modIdx = 0;
+}
+function engMod() {
+  if (!rawText.length) return;
+  const pos = rawText.length - 1;
+  if (eng.modPos !== pos) { eng.modBase = rawText[pos]; eng.modIdx = 0; eng.modPos = pos; }
+  const seq = modCycleFor(eng.modBase);
+  if (seq.length < 2) return;
+  eng.modIdx = (eng.modIdx + 1) % seq.length;
+  replaceLast(seq[eng.modIdx]);
+  eng.group = null;
+}
+function engStandalone(ch) { appendText(ch); resetEng(); }
+function engBackspace() { if (rawText.length) setText(rawText.slice(0,-1)); resetEng(); }
+
+// ══ 포인터(화살표+링) ═══════════════════════════════════════════════
+const arrowEl = document.getElementById('key-arrow');
+const ringEl  = document.getElementById('key-ring');
+function pointKey(name) {
+  const p = KEY_POS[name];
+  if (!p) { hidePointer(); return; }
+  const w = name === 'space' ? 25.5 : KEY_W;
+  arrowEl.style.left = p[0] + '%';
+  arrowEl.style.top  = (p[1] - KEY_H/2 - 3.4) + '%';
+  arrowEl.classList.remove('hidden');
+  ringEl.style.left = (p[0] - w/2) + '%';
+  ringEl.style.top  = (p[1] - KEY_H/2) + '%';
+  ringEl.style.width = w + '%';
+  ringEl.style.height = KEY_H + '%';
+  ringEl.classList.remove('hidden');
+}
+function hidePointer() { arrowEl.classList.add('hidden'); ringEl.classList.add('hidden'); }
+
+// ══ 추천바 ═════════════════════════════════════════════════════════
+const recbarEl = document.getElementById('recbar');
+let recItems = [], recSel = -1;
+function showRecs(items, sparkIdx) {
+  recItems = items.slice(); recSel = -1;
+  recbarEl.innerHTML = '';
+  items.forEach((txt, i) => {
+    const d = document.createElement('div');
+    d.className = 'rec';
+    d.textContent = txt;
+    if (i === sparkIdx) {
+      const s = document.createElement('span');
+      s.className = 'spark';
+      s.textContent = '← 予測変換に見えたら予測キーを押して選択モードに入ってください。';
+      d.appendChild(s);
+    }
+    recbarEl.appendChild(d);
+  });
+  recbarEl.style.display = 'block';
+}
+function hideRecs() { recbarEl.style.display = 'none'; recItems = []; recSel = -1; }
+function setRecSel(i) {
+  recSel = i;
+  [...recbarEl.children].forEach((el, idx) => {
+    el.classList.toggle('sel', idx === i);
+    const sp = el.querySelector('.spark');
+    if (sp) sp.remove();          // 선택이 시작되면 반짝임은 거둔다
+  });
+}
+
+// ══ 안내 팝업 ══════════════════════════════════════════════════════
+const popupEl = document.getElementById('popup');
+const popupMsgEl = document.getElementById('popup-msg');
+const popupOkEl = document.getElementById('popup-ok');
+let typing = null, typingDone = false, onPopupAdvance = null, typingOnDone = null;
+
+function typewrite(html, done) {
+  clearTimeout(typing);
+  typingDone = false;
+  typingOnDone = done || null;
+  popupOkEl.classList.remove('show');
+  popupMsgEl.innerHTML = '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const spans = [];
+  (function walk(src, dst) {
+    src.childNodes.forEach(node => {
+      if (node.nodeType === 3) {
+        for (const ch of node.nodeValue) {
+          if (ch === '\n') { dst.appendChild(document.createElement('br')); continue; }
+          const s = document.createElement('span');
+          s.textContent = ch; s.style.opacity = '0';
+          dst.appendChild(s); spans.push(s);
+        }
+      } else {
+        const clone = node.cloneNode(false);
+        dst.appendChild(clone);
+        walk(node, clone);
+      }
+    });
+  })(tmp, popupMsgEl);
+
+  let i = 0;
+  (function step() {
+    if (i >= spans.length) {
+      typingDone = true;
+      const fn = typingOnDone; typingOnDone = null;
+      if (fn) fn();
+      return;
+    }
+    spans[i].style.opacity = '1';
+    if (spans[i].textContent.trim()) playTick();
+    i++;
+    typing = setTimeout(step, 42);
+  })();
+}
+function finishTypewrite() {
+  clearTimeout(typing);
+  [...popupMsgEl.querySelectorAll('span')].forEach(s => s.style.opacity = '1');
+  typingDone = true;
+  const fn = typingOnDone; typingOnDone = null;
+  if (fn) fn();
+}
+function armPopupOk() {
+  setTimeout(() => { popupOkEl.classList.add('show'); }, 320);
+}
+// 새 팝업 페이지가 뜬 직후 잠깐 스페이스를 무시한다 — "스페이스로 진행" 안내를 보고
+// 습관적으로 한 번 더 누르는 입력이 방금 시작된 타자 애니메이션을 곧바로 건너뛰지
+// 않도록. 이 짧은 창이 지나면 스페이스로 타자 스킵/진행은 정상 동작한다.
+let popupLockUntil = 0;
+function showPopup(html, onAdvance) {
+  mode = 'popup';
+  popupEl.style.display = 'flex';
+  onPopupAdvance = onAdvance || null;
+  popupLockUntil = Date.now() + 500;
+  typewrite(html, armPopupOk);
+}
+function hidePopup() { popupEl.style.display = 'none'; }
+
+// ══ 타자 효과음 ════════════════════════════════════════════════════
+let audioCtx = null;
+function ensureAudio() {
+  if (!audioCtx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) audioCtx = new AC(); }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}
+function playTick() {
+  if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+  osc.type = 'square';
+  osc.frequency.value = 1150 + Math.random() * 220;
+  gain.gain.setValueAtTime(0.045, t);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(t); osc.stop(t + 0.05);
+}
+
+// ══ 시나리오 ═══════════════════════════════════════════════════════
+// mode: 'popup' | 'exercise' | 'free' | 'blind'
+let mode = 'popup';
+
+const INTRO = [
+  `左手エリアには<span class="k">テンキー</span>があり、\n右手エリアには<span class="k">フリックキー</span>があります。\nフリックの方向はスマートフォンと同じです。`,
+  `テンキー配列はこう覚えると簡単です。\nわは脇に、\n1行目 │ <span class="k">まずは </span> \n2行目 │ <span class="k">若い時</span> \n3行目 │ <span class="k">やりな!</span> `,
+  `それでは今から<span class="k">「こんにちは」</span>を\n入力してみましょう。\n矢印に従って押してみてください。`,
+];
+let introIdx = 0;
+let inIntro = true;
+
+// こんにちは 입력 연습. arrow만으로 안내, 이전 결과를 확인할 시간을 두고 다음 화살표를 띄운다.
+const EX = [
+  { expect:{type:'group', key:'s'}, arrow:'s',
+    run() { setText('か'); showRecs(['化','確認','彼は','株式会社']); } },
+  { expect:{type:'flick', key:'k'}, arrow:'k',
+    run() { setText('こ'); showRecs(['今後ともよろしくお願いいたします。','こ','こない','コミュニケーション']); } },
+  { expect:{type:'standalone', key:'o'}, arrow:'o',
+    run() { setText('こん'); showRecs(['今後ともよろしくお願いいたします。','こんにちは','こんな','こんばんは'], 1); } },
+  // 예측키(스페이스)로 선택 모드 진입 → 선택 모드에선 예측키가 ▼(다음 후보) → 확정▼(k)으로 확정
+  { expect:{type:'ok'}, arrow:'space',
+    run() { setRecSel(0); setText(recItems[0]); } },
+  { expect:{type:'ok'}, arrow:'space',
+    run() { setRecSel(1); setText(recItems[1]); } },
+  { expect:{type:'flick', key:'k'}, arrow:'k',
+    run() { setText(recItems[1]); hideRecs(); hidePointer(); } },
+];
+let exIdx = 0;
+const REVIEW_MS = 900;   // 직전 입력 결과를 눈으로 확인할 시간
+
+function startExercise() {
+  mode = 'exercise';
+  hidePopup();
+  exIdx = 0;
+  setText('');
+  setTimeout(showExStep, 550);
+}
+function showExStep() {
+  const st = EX[exIdx];
+  pointKey(st.arrow);
+}
+function classifyKey(k) {
+  if (k === ' ') return { type:'ok' };
+  if (GROUP_KEYS[k]) return { type:'group', key:k };
+  if (FLICK_KEYS[k] != null) return { type:'flick', key:k };
+  if (k === 'u') return { type:'mod' };
+  if (STANDALONE[k]) return { type:'standalone', key:k };
+  if (k === 'm') return { type:'more' };
+  return null;
+}
+function exerciseKey(k) {
+  const st = EX[exIdx];
+  const c = classifyKey(k);
+  if (!c || c.type !== st.expect.type) return;
+  if (st.expect.key && c.key !== st.expect.key) return;
+  hidePointer();
+  st.run();
+  exIdx++;
+  if (exIdx >= EX.length) {
+    setTimeout(() => showPopup(
+      `お疲れ様でした！ 🎉\nそれでは<span class="k">予測キー</span>を押して\nひらがな自由入力をしてみてください。`,
+      startFree
+    ), 1100);
+    return;
+  }
+  setTimeout(showExStep, REVIEW_MS);
+}
+
+// ══ 자유 입력 / 블라인드 모드 ══════════════════════════════════════
+function applyModeButtons() {
+  const blind = mode === 'blind';
+  document.getElementById('clearBtn').style.display = 'block';   // 두 모드 모두 우상단에 지우기 유지
+  const bb = document.getElementById('blindBtn');
+  bb.style.display = 'block';
+  bb.textContent = blind ? '← 通常モードへ' : '🏆 ブラインドタッチ挑戦';
+  bb.style.background = blind ? '#6b7280' : '#f59e0b';
+  document.getElementById('mode-tag').style.display = 'block';
+  document.getElementById('editor-wrap').classList.add('kana-only');
+}
+function startFree() {
+  mode = 'free';
+  hidePopup(); hideRecs(); hidePointer();
+  resetEng(); setText('');
+  document.getElementById('bg-img').src = 'images/bg_tutorial.png';
+  applyModeButtons();
+}
+function startBlind() {
+  mode = 'blind';
+  hidePopup(); hideRecs(); hidePointer();
+  resetEng(); setText('');
+  document.getElementById('bg-img').src = 'images/bg_tutorial_blind.png';
+  applyModeButtons();
+}
+function toggleBlind() { (mode === 'blind' ? startFree : startBlind)(); }
+
+// ══ 물리 키보드 라우터 ═════════════════════════════════════════════
+const IGNORE = new Set(['shift','control','alt','meta','capslock','tab','escape',
+  'arrowleft','arrowright','arrowup','arrowdown','f5','f11','f12']);
+
+window.addEventListener('keydown', (e) => {
+  if (e.repeat) return;               // 키를 오래 누르고 있을 때의 자동 반복 입력은 무시
+  ensureAudio();
+  const raw = e.key;
+  const isSpace = raw === ' ' || e.code === 'Space' || raw === 'Spacebar';
+  const k = isSpace ? ' ' : (raw || '').toLowerCase();
+  if (!isSpace && IGNORE.has(k)) return;
+  if (k !== 'f5' && k !== 'f12') e.preventDefault();
+
+  // ── 안내 팝업 ──
+  if (mode === 'popup') {
+    if (k !== ' ') return;
+    if (Date.now() < popupLockUntil) return;               // 페이지 전환 직후 습관성 연타 무시
+    if (!typingDone) { finishTypewrite(); return; }
+    if (!popupOkEl.classList.contains('show')) return;
+    if (inIntro && introIdx < INTRO.length - 1) {
+      introIdx++;
+      showPopup(INTRO[introIdx], introIdx === INTRO.length - 1 ? startExercise : null);
+      return;
+    }
+    inIntro = false;
+    const fn = onPopupAdvance; onPopupAdvance = null;
+    if (fn) fn();
+    return;
+  }
+
+  // ── こんにちは 연습 ──
+  if (mode === 'exercise') { exerciseKey(k); return; }
+
+  // ── 자유 / 블라인드 입력 (동작 동일, 배경만 다름) ──
+  if (mode === 'free' || mode === 'blind') {
+    if (k === 'backspace' || k === BS_KEY) { engBackspace(); return; }
+    if (k === ' ') {
+      // 가나 전용 모드에는 변환·후보가 없으므로 스페이스는 언제나 공백 문자.
+      appendText(' '); resetEng(); return;
+    }
+    if (GROUP_KEYS[k])     { engGroup(GROUP_KEYS[k]); return; }
+    if (FLICK_KEYS[k] != null) { engFlick(FLICK_KEYS[k]); return; }
+    if (k === 'u')         { engMod(); return; }
+    if (STANDALONE[k])     { engStandalone(STANDALONE[k]); return; }
+    if (k === 'enter')     { appendText('\n'); resetEng(); return; }
+    if (raw === ',')       { appendText('、'); resetEng(); return; }  // 読点
+    if (raw === '.')       { appendText('。'); resetEng(); return; }  // 句点
+    // 자판에 없는 한 글자(숫자·기호 등)는 그대로 입력창에 흘려 넣는다 —
+    // 막 두들겨 볼 때 숫자·기호도 눌러 보게 되므로.
+    if (raw && raw.length === 1) { appendText(raw); resetEng(); return; }
+  }
+});
+
+// ══ 버튼 ══════════════════════════════════════════════════════════
+document.getElementById('homeBtn').addEventListener('click', () => location.href = 'index.html');
+document.getElementById('clearBtn').addEventListener('click', () => { resetEng(); setText(''); });
+document.getElementById('blindBtn').addEventListener('click', toggleBlind);
+
+// ══ 시작 ══════════════════════════════════════════════════════════
+setText('');
+showPopup(INTRO[0], null);
+</script>
+</body>
+</html>

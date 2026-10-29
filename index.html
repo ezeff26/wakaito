@@ -327,6 +327,11 @@
                 <p class="text-sm text-gray-500 leading-relaxed">
                     パソコンのブラウザで<br><span class="keep-phrase">wakaito.com</span> を開いて<br>お試しください。
                 </p>
+                <!-- 나중에 PC 에서 열 수 있게 체험 링크를 나에게 보내 둔다 (LINE 은 Keep メモ 로 보내면 PC 판 LINE 에서 바로 열린다) -->
+                <a id="send-line" href="#" target="_blank" rel="noopener"
+                   class="inline-block w-full max-w-xs mt-2 py-3 bg-[#06C755] text-white rounded-xl font-bold text-center">LINEで自分に送る</a>
+                <button id="send-share" type="button"
+                        class="w-full max-w-xs py-3 bg-white text-gray-900 border border-gray-300 rounded-xl font-bold">リンクを共有</button>
             </div>
         </div>
 
@@ -346,6 +351,43 @@
         <p class="mb-3">お問い合わせ：<a href="mailto:wakaito.cs@gmail.com" class="hover:text-blue-600 select-all">wakaito.cs@gmail.com</a></p>
         <p>© 2026 WAKAITO All rights reserved.</p>
     </footer>
+
+<!-- 모바일 PC 안내: 체험 링크 보내기. 공유 창이 없는 브라우저에서는 링크를 복사한다 -->
+<script>
+(function () {
+    var TRY_URL = 'https://wakaito.com/try.html';
+    var TEXT = 'ワカイトキーをPCで体験する';
+    document.getElementById('send-line').href =
+        'https://line.me/R/share?text=' + encodeURIComponent(TEXT + '\n' + TRY_URL);
+
+    var share = document.getElementById('send-share');
+    if (!navigator.share) share.textContent = 'リンクをコピー';
+
+    // 클립보드 API 가 막혀 있으면 (권한, 오래된 브라우저) 숨긴 입력칸으로 복사한다
+    function copy() {
+        var done = function () { share.textContent = 'コピーしました'; };
+        var fallback = function () {
+            var ta = document.createElement('textarea');
+            ta.value = TRY_URL; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            var ok = false;
+            try { ok = document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+            if (ok) done(); else window.prompt('このリンクをコピーしてください', TRY_URL);
+        };
+        if (navigator.clipboard) navigator.clipboard.writeText(TRY_URL).then(done, fallback);
+        else fallback();
+    }
+
+    share.addEventListener('click', function () {
+        if (!navigator.share) return copy();
+        // 공유 창을 사용자가 닫은 경우(AbortError)만 그대로 두고, 그 밖의 실패는 복사로 넘어간다
+        navigator.share({ title: TEXT, text: TEXT, url: TRY_URL }).catch(function (e) {
+            if (!e || e.name !== 'AbortError') copy();
+        });
+    });
+})();
+</script>
 
 <!-- 0기생 남은 자리: 구글 시트의 Apps Script(exe\wakaitokey\signup\apps_script.gs)에 묻는다.
      실패하면 HTML 에 적힌 숫자를 그대로 둔다. -->

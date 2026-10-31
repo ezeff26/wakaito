@@ -136,10 +136,10 @@ footer{text-align:center;color:var(--ink-3);font-size:13px;padding:30px 20px 50p
       <tr><td>濁点・半濁点・小文字</td><td><kbd>U</kbd>（押すたびに切り替わります）</td></tr>
       <tr><td>ん／っ／ー</td><td><kbd>O</kbd>／<kbd>P</kbd>／<kbd>Q</kbd></td></tr>
       <tr><td>1文字削除</td><td><kbd>N</kbd> または <kbd class="w">BackSpace</kbd></td></tr>
-      <tr><td>予測候補</td><td><kbd class="w">Space</kbd></td></tr>
-      <tr><td>変換候補</td><td><kbd>M</kbd></td></tr>
-      <tr><td>候補の移動</td><td><kbd class="w">Space</kbd>・<kbd>I</kbd>・<kbd>J</kbd>・<kbd>L</kbd></td></tr>
-      <tr><td>確定</td><td><kbd>K</kbd>（▼）　※ひらがなのまま確定するときは <kbd class="w">Enter</kbd></td></tr>
+      <tr><td>変換</td><td><kbd class="w">Space</kbd>（そのまま）</td></tr>
+      <tr><td>予測候補</td><td><kbd>M</kbd>（Tab）</td></tr>
+      <tr><td>候補の移動</td><td><kbd>I</kbd>・<kbd>J</kbd>・<kbd>L</kbd>（方向キー）</td></tr>
+      <tr><td>確定</td><td><kbd>K</kbd>（▼・Enter）　※ひらがなのまま確定するときは <kbd class="w">Enter</kbd></td></tr>
       <tr><td>ひとつ前に戻る</td><td><kbd class="w">Esc</kbd></td></tr>
       <tr><td>フリック入力のオン・オフ</td><td>タスクトレイのアイコンを右クリック →「フリック ON／OFF」</td></tr>
     </table>
@@ -212,40 +212,38 @@ footer{text-align:center;color:var(--ink-3);font-size:13px;padding:30px 20px 50p
   <section id="layout">
     <h2><span class="n">5</span>キー配列</h2>
     <p class="lead">左手で<b>行</b>を選び、右手で<b>段</b>を選びます。スマートフォンのフリック入力と同じ考え方を、PCのキーボードに移したものです。</p>
-    <figure class="figure"><img src="images/pc.png" alt="キー配列"><figcaption>左手テンキー（行）・右手フリックキー（段）・予測＝Space・変換＝M</figcaption></figure>
+    <figure class="figure"><img src="images/pc.png" alt="キー配列"><figcaption>左手テンキー（行）・右手フリックキー（段）・変換＝Space・予測＝M</figcaption></figure>
     <h3>覚え方</h3>
     <figure class="figure"><img src="images/mnemonic.png" alt="まずは / 若い時 / やりな!"><figcaption>上の段 まさは＝「まずは」、中の段 わかあた＝「若い時」、下の段 やらな＝「やりな！」</figcaption></figure>
   </section>
 
   <section id="convert">
     <h2><span class="n">6</span>予測と変換</h2>
-    <p class="lead">かなを入力したら、2つの方法で漢字やカタカナにできます。どちらの場合も、<b>候補を選んでいる間は右手のフリックキーがカーソルの役割</b>をし、<kbd>K</kbd>（▼）で確定します。</p>
-    <div class="two">
-      <div class="card">
-        <b><kbd class="w">Space</kbd>＝予測</b>
-        <p style="margin:8px 0 0;font-size:15px">入力中に表示される<b>予測候補</b>の一覧に移動します。長い言葉やよく使う表現を、最後まで入力せずに選べます。</p>
-      </div>
-      <div class="card">
-        <b><kbd>M</kbd>＝変換</b>
-        <p style="margin:8px 0 0;font-size:15px">通常の<b>変換候補</b>の一覧を開きます。入力したかなを漢字に変換するときに使います。</p>
-      </div>
-    </div>
+    <p class="lead">変換や予測は、お使いの日本語入力（IME）が行います。ワカイトキーは、手をホームポジションから離さずに済むよう、<b>遠くにあるキーを近くのキーに置き換えて IME に送るだけ</b>です。</p>
 
-    <h3>候補を選んでいる間のキー</h3>
+    <h3>ワカイトキーが IME に送るキー</h3>
     <div class="tbl-scroll">
     <table class="tbl">
-      <tr><th style="width:30%">キー</th><th>予測候補（Space で表示）</th><th>変換候補（M で表示）</th></tr>
-      <tr><td><kbd class="w">Space</kbd></td><td>次の候補 ▼</td><td>次の候補 ▼</td></tr>
-      <tr><td><kbd>M</kbd></td><td>予測をやめて<b>変換に切り替え</b></td><td>次の候補 ▼</td></tr>
-      <tr><td><kbd>I</kbd> ▲</td><td>前の候補</td><td>前の候補</td></tr>
-      <tr><td><kbd>J</kbd> ◀ ／ <kbd>L</kbd> ▶</td><td>［←］［→］キーと同じ</td><td>［←］［→］キーと同じ（文節の移動）</td></tr>
-      <tr><td><kbd>K</kbd> ▼</td><td colspan="2"><b>確定</b></td></tr>
-      <tr><td><kbd class="w">Esc</kbd> ／ <kbd>N</kbd> ／ <kbd class="w">BackSpace</kbd></td><td colspan="2">ひとつ前に戻る（候補一覧を閉じて入力中の状態へ）</td></tr>
-      <tr><td>行キー（かな）</td><td colspan="2">選んだ候補を確定し、そのまま次の文字を入力</td></tr>
+      <tr><th style="width:30%">押すキー</th><th>IME に送られるキー</th></tr>
+      <tr><td><kbd class="w">Space</kbd></td><td><kbd class="w">Space</kbd>（そのまま）</td></tr>
+      <tr><td><kbd>M</kbd></td><td><kbd class="w">Tab</kbd></td></tr>
+      <tr><td><kbd>I</kbd> ▲ ／ <kbd>J</kbd> ◀ ／ <kbd>L</kbd> ▶</td><td>［↑］／［←］／［→］<br><span class="sub">※ かなを入力している間はフリックキーとして動作します。</span></td></tr>
+      <tr><td><kbd>K</kbd> ▼</td><td>確定が必要なときは <kbd class="w">Enter</kbd>、それ以外は［↓］<br><span class="sub">※ かなを入力している間はフリックキーとして動作します。</span></td></tr>
+      <tr><td><kbd>N</kbd></td><td><kbd class="w">BackSpace</kbd></td></tr>
     </table>
     </div>
-    <p style="margin-top:14px"><kbd class="w">Enter</kbd> を押すと、ふだんどおり入力中の文字をそのまま（ひらがなで）確定します。マウスでクリックしても入力中の状態はリセットされます。</p>
-    <p>入力中の文字がないときの <kbd class="w">Space</kbd> は、通常のスペースです。</p>
+
+    <h3>例：Microsoft IME の場合</h3>
+    <div class="card">
+      <ul style="margin:0;padding-left:1.2em">
+        <li><kbd class="w">Space</kbd>：入力したかなを、文章ごと最も可能性の高い日本語の文に変換します。もう一度押すと、変換候補の一覧が開きます。</li>
+        <li><kbd>M</kbd>（Tab）：入力中に表示される予測候補の一覧に移動します。</li>
+        <li><kbd>I</kbd> ▲ ／ <kbd>J</kbd> ◀ ／ <kbd>L</kbd> ▶：候補の移動や、文節の移動に使います。</li>
+        <li><kbd>K</kbd> ▼（Enter）：確定します。</li>
+      </ul>
+    </div>
+    <p style="margin-top:14px">IME によって、同じキーでも動作が少し異なる場合があります。そのときは、お使いの IME で ［Tab］・方向キー・［Enter］を押したときと同じ動作になります。</p>
+    <p>マウスでクリックすると、ワカイトキーの入力中の状態はリセットされます。</p>
   </section>
 
   <section id="faq" class="faq">

@@ -51,32 +51,6 @@
   }
   @keyframes blink { 0%,100%{opacity:0;} 50%{opacity:1;} }
 
-  /* ── 추천바 (IME 변환 후보 창 느낌) ── */
-  #recbar {
-    left:7%; top:15.5%; width:56%;
-    background: rgba(255,255,255,.98); border:1px solid #c7d3dd;
-    border-radius:8px; box-shadow:0 8px 22px rgba(0,0,0,.18);
-    overflow:visible; display:none;
-  }
-  #recbar .rec {
-    position:relative;
-    padding: 1.7% 3%; font-size: clamp(14px, 1.8vw, 22px); font-weight:700; color:#26313c;
-    border-bottom:1px solid #e7edf2; white-space:nowrap;
-  }
-  #recbar .rec:last-child { border-bottom:none; }
-  #recbar .rec.sel { background:#3f6fb8; color:#fff; }
-  #recbar .rec.sel:first-child { border-radius:7px 7px 0 0; }
-  #recbar .rec.sel:last-child  { border-radius:0 0 7px 7px; }
-
-  /* 후보 옆에 붙는 안내: ← 화살표 + 멘트, 같은 색으로 깜빡인다 */
-  #recbar .spark {
-    display:inline-block; margin-left:.7em; vertical-align:.04em;
-    font-size: clamp(12px, 1.45vw, 17px); font-weight:900; color:#f39c12;
-    white-space:nowrap;
-    animation: sparkBlink 1s ease-in-out infinite;
-  }
-  @keyframes sparkBlink { 0%,100%{opacity:1;} 50%{opacity:.28;} }
-
   /* ── 지금 눌러야 할 키 위에 까딱이는 화살표 + 하이라이트 링 ── */
   #key-arrow { width:0; transform: translateX(-50%); display:flex; flex-direction:column; align-items:center; }
   #key-arrow.hidden, #key-ring.hidden { display:none; }
@@ -88,7 +62,7 @@
     filter: drop-shadow(0 2px 2px rgba(0,0,0,.3));
   }
   @keyframes bob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(6px);} }
-  #key-ring {
+  #key-ring, .hl-ring {
     border:4px solid #e0362f; border-radius:13px;
     box-shadow:0 0 0 4px rgba(224,54,47,.25), 0 0 18px 4px rgba(224,54,47,.35);
     animation: ringPulse .9s ease-in-out infinite;
@@ -152,7 +126,6 @@
   <img id="bg-img" src="images/bg_tutorial.png" alt="" draggable="false" />
 
   <div id="editor-wrap" class="ov"><span id="editor" class="jp"></span></div>
-  <div id="recbar" class="ov jp"></div>
   <div id="mode-tag" class="ov">✏️ 仮名専用練習モード・変換・予測なしで入力のみ</div>
 
   <div id="key-ring" class="ov hidden"></div>
@@ -160,7 +133,7 @@
 
   <div id="popup" class="ov"><div class="card">
     <div id="popup-msg" class="msg jp"></div>
-    <div id="popup-ok" class="okhint">▶ 予測キー（スペース）を押してください</div>
+    <div id="popup-ok" class="okhint">▶ スペースを押してください</div>
   </div></div>
 
   <button id="blindBtn">🏆 ブラインドタッチ挑戦</button>
@@ -289,34 +262,19 @@ function pointKey(name) {
   ringEl.classList.remove('hidden');
 }
 function hidePointer() { arrowEl.classList.add('hidden'); ringEl.classList.add('hidden'); }
-
-// ══ 추천바 ═════════════════════════════════════════════════════════
-const recbarEl = document.getElementById('recbar');
-let recItems = [], recSel = -1;
-function showRecs(items, sparkIdx) {
-  recItems = items.slice(); recSel = -1;
-  recbarEl.innerHTML = '';
-  items.forEach((txt, i) => {
-    const d = document.createElement('div');
-    d.className = 'rec';
-    d.textContent = txt;
-    if (i === sparkIdx) {
-      const s = document.createElement('span');
-      s.className = 'spark';
-      s.textContent = '← 予測変換に見えたら予測キーを押して選択モードに入ってください。';
-      d.appendChild(s);
-    }
-    recbarEl.appendChild(d);
-  });
-  recbarEl.style.display = 'block';
-}
-function hideRecs() { recbarEl.style.display = 'none'; recItems = []; recSel = -1; }
-function setRecSel(i) {
-  recSel = i;
-  [...recbarEl.children].forEach((el, idx) => {
-    el.classList.toggle('sel', idx === i);
-    const sp = el.querySelector('.spark');
-    if (sp) sp.remove();          // 선택이 시작되면 반짝임은 거둔다
+// 안내용: 화살표 없이 여러 키에 링만 두른다. 빈 배열이면 모두 걷는다.
+const stageEl = document.getElementById('stage');
+function highlightKeys(names) {
+  stageEl.querySelectorAll('.hl-ring').forEach(el => el.remove());
+  names.forEach(name => {
+    const p = KEY_POS[name];
+    const r = document.createElement('div');
+    r.className = 'ov hl-ring';
+    r.style.left = (p[0] - KEY_W/2) + '%';
+    r.style.top = (p[1] - KEY_H/2) + '%';
+    r.style.width = KEY_W + '%';
+    r.style.height = KEY_H + '%';
+    stageEl.appendChild(r);
   });
 }
 
@@ -420,21 +378,32 @@ let introIdx = 0;
 let inIntro = true;
 
 // こんにちは 입력 연습. arrow만으로 안내, 이전 결과를 확인할 시간을 두고 다음 화살표를 띄운다.
+// 2026-10-31: 예측·변환 후보 고르기는 빼고 가나만 끝까지 친다 (초보자에게 후보창은 시각적 소음).
 const EX = [
-  { expect:{type:'group', key:'s'}, arrow:'s',
-    run() { setText('か'); showRecs(['化','確認','彼は','株式会社']); } },
-  { expect:{type:'flick', key:'k'}, arrow:'k',
-    run() { setText('こ'); showRecs(['今後ともよろしくお願いいたします。','こ','こない','コミュニケーション']); } },
-  { expect:{type:'standalone', key:'o'}, arrow:'o',
-    run() { setText('こん'); showRecs(['今後ともよろしくお願いいたします。','こんにちは','こんな','こんばんは'], 1); } },
-  // 예측키(스페이스)로 선택 모드 진입 → 선택 모드에선 예측키가 ▼(다음 후보) → 확정▼(k)으로 확정
-  { expect:{type:'ok'}, arrow:'space',
-    run() { setRecSel(0); setText(recItems[0]); } },
-  { expect:{type:'ok'}, arrow:'space',
-    run() { setRecSel(1); setText(recItems[1]); } },
-  { expect:{type:'flick', key:'k'}, arrow:'k',
-    run() { setText(recItems[1]); hideRecs(); hidePointer(); } },
+  { expect:{type:'group', key:'s'}, arrow:'s', run() { setText('か'); } },
+  { expect:{type:'flick', key:'k'}, arrow:'k', run() { setText('こ'); } },
+  { expect:{type:'standalone', key:'o'}, arrow:'o', run() { setText('こん'); } },
+  { expect:{type:'group', key:'v'}, arrow:'v', run() { setText('こんな'); } },
+  { expect:{type:'flick', key:'j'}, arrow:'j', run() { setText('こんに'); } },
+  { expect:{type:'group', key:'f'}, arrow:'f', run() { setText('こんにた'); } },
+  { expect:{type:'flick', key:'j'}, arrow:'j', run() { setText('こんにち'); } },
+  { expect:{type:'group', key:'r'}, arrow:'r', run() { setText('こんにちは'); } },
 ];
+
+// 연습 뒤 안내 2장: 플릭키=방향키, 변환 중 ▼=확정. 연습 없이 해당 키만 테두리로 짚어 준다.
+const OUTRO = [
+  { keys:['i','j','l','k'],
+    html:`お疲れ様でした！ 🎉\n<span class="k">フリックキー</span>は、そのまま<span class="k">方向キー</span>としても使えます。\n遠くの方向キーまで手を伸ばす必要はありません。` },
+  { keys:['k'],
+    html:`変換中は、下のフリックキー（<span class="k">確定▼</span>）が\n<span class="k">確定キー</span>になります。\n遠くのEnterキーまで手を伸ばす必要はありません。` },
+  { keys:[],
+    html:`それでは<span class="k">スペース</span>を押して\nひらがな自由入力をしてみてください。` },
+];
+function showOutro(i) {
+  const o = OUTRO[i];
+  highlightKeys(o.keys);
+  showPopup(o.html, i < OUTRO.length - 1 ? () => showOutro(i + 1) : () => { highlightKeys([]); startFree(); });
+}
 let exIdx = 0;
 const REVIEW_MS = 900;   // 직전 입력 결과를 눈으로 확인할 시간
 
@@ -450,12 +419,10 @@ function showExStep() {
   pointKey(st.arrow);
 }
 function classifyKey(k) {
-  if (k === ' ') return { type:'ok' };
   if (GROUP_KEYS[k]) return { type:'group', key:k };
   if (FLICK_KEYS[k] != null) return { type:'flick', key:k };
   if (k === 'u') return { type:'mod' };
   if (STANDALONE[k]) return { type:'standalone', key:k };
-  if (k === 'm') return { type:'more' };
   return null;
 }
 function exerciseKey(k) {
@@ -467,10 +434,7 @@ function exerciseKey(k) {
   st.run();
   exIdx++;
   if (exIdx >= EX.length) {
-    setTimeout(() => showPopup(
-      `お疲れ様でした！ 🎉\nそれでは<span class="k">予測キー</span>を押して\nひらがな自由入力をしてみてください。`,
-      startFree
-    ), 1100);
+    setTimeout(() => showOutro(0), 1100);
     return;
   }
   setTimeout(showExStep, REVIEW_MS);
@@ -489,14 +453,14 @@ function applyModeButtons() {
 }
 function startFree() {
   mode = 'free';
-  hidePopup(); hideRecs(); hidePointer();
+  hidePopup(); hidePointer();
   resetEng(); setText('');
   document.getElementById('bg-img').src = 'images/bg_tutorial.png';
   applyModeButtons();
 }
 function startBlind() {
   mode = 'blind';
-  hidePopup(); hideRecs(); hidePointer();
+  hidePopup(); hidePointer();
   resetEng(); setText('');
   document.getElementById('bg-img').src = 'images/bg_tutorial_blind.png';
   applyModeButtons();
